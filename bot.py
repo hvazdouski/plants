@@ -15,41 +15,46 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    welcome_text = f"Привет, {update.effective_user.first_name}! 🌿\n\nЯ бот-справочник по растениям.\n\n/plants - список растений\n/help - справка"
+    """Команда /start - приветствие и меню"""
     plants = get_all_plants()
     keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in plants]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(welcome_text, reply_markup=reply_markup)
+    await update.message.reply_text(
+        f"Привет, {update.effective_user.first_name}! 🌿\n\nЯ бот-справочник по растениям.\n\n/plants - список растений\n/help - справка",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    help_text = "📚 **Команды:**\n/start - начать\n/plants - список растений\n/help - справка"
-    await update.message.reply_text(help_text)
+    """Команда /help - справка"""
+    await update.message.reply_text("📚 **Команды:**\n/start - начать\n/plants - список растений\n/help - справка")
 
 async def plants_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Команда /plants - список всех растений"""
     plants = get_all_plants()
     text = "🌱 **Список растений:**\n\n" + "\n".join(f"{p['id']}. {p['name']}" for p in plants)
     keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in plants]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(text, reply_markup=reply_markup)
+    await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик кнопок с информацией о растении"""
     query = update.callback_query
     await query.answer()
     
     plant_id = int(query.data.split('_')[1])
     plant = get_plant_by_id(plant_id)
     
-    if plant:
-        response_text = f"🌿 **{plant['name']}**\n\n📝 {plant['description']}\n\n💧 {plant['care']}"
+    if not plant:
+        return
         
-        if plant.get('image_url'):
-            try:
-                await query.message.reply_photo(photo=plant['image_url'], caption=response_text)
-            except Exception as e:
-                logger.error(f"Ошибка фото: {e}")
-                await query.message.reply_text(response_text)
-        else:
+    response_text = f"🌿 **{plant['name']}**\n\n📝 {plant['description']}\n\n💧 {plant['care']}"
+    
+    if plant.get('image_url'):
+        try:
+            await query.message.reply_photo(photo=plant['image_url'], caption=response_text)
+        except Exception as e:
+            logger.error(f"Ошибка фото: {e}")
             await query.message.reply_text(response_text)
+    else:
+        await query.message.reply_text(response_text)
 
 async def webhook_handler(request):
     """Обработчик входящих обновлений от Telegram"""
