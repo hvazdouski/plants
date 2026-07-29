@@ -132,10 +132,10 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     """Запуск бота"""
     # Получаем токен из переменных окружения
-    token = os.environ.get('TELEGRAM_BOT_TOKEN')
+    token = os.environ.get('plant_home_bot')
     
     if not token:
-        logger.error("TELEGRAM_BOT_TOKEN не найден в переменных окружения!")
+        logger.error("plant_home_bot не найден в переменных окружения!")
         return
     
     # Создаем приложение
