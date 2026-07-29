@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+import aiohttp
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes, CallbackQueryHandler
 from aiohttp import web
@@ -49,7 +50,15 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if plant.get('image_url'):
         try:
-            await query.message.reply_photo(photo=plant['image_url'], caption=response_text)
+            # Скачиваем изображение через aiohttp и отправляем как файл
+            async with aiohttp.ClientSession() as session:
+                async with session.get(plant['image_url']) as resp:
+                    if resp.status == 200:
+                        image_data = await resp.read()
+                        await query.message.reply_photo(photo=image_data, caption=response_text)
+                    else:
+                        logger.warning(f"Не удалось загрузить фото, статус: {resp.status}")
+                        await query.message.reply_text(response_text)
         except Exception as e:
             logger.error(f"Ошибка фото: {e}")
             await query.message.reply_text(response_text)
