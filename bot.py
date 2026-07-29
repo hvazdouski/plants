@@ -94,10 +94,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def webhook_handler(request):
     """Обработчик входящих обновлений от Telegram"""
-    data = await request.json()
-    update = Update.de_json(data, application.bot)
-    await application.process_update(update)
-    return web.Response()
+    try:
+        data = await request.json()
+        update = Update.de_json(data, application.bot)
+        await application.process_update(update)
+        return web.Response(text="OK") # Явно возвращаем OK
+    except Exception as e:
+        logger.error(f"Ошибка в webhook_handler: {e}")
+        return web.Response(text="Error", status=500)
 
 
 def main():
