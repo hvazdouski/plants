@@ -44,9 +44,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     plant = get_plant_by_id(plant_id)
     
     if not plant:
+        await query.message.reply_text("Растение не найдено.")
         return
         
-    response_text = f"🌿 **{plant['name']}**\n\n📝 {plant['description']}\n\n💧 {plant['care']}"
+    name = plant.get('name', 'Без названия')
+    description = plant.get('description', 'Описание отсутствует')
+    care = plant.get('care', 'Уход не указан')
+    
+    response_text = f"🌿 **{name}**\n\n📝 {description}\n\n💧 {care}"
     
     if plant.get('image_url'):
         try:
