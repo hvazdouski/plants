@@ -13,7 +13,7 @@ PLANTS_DB = [
         'name': 'Монстера',
         'description': 'Тропическое растение с большими листьями.',
         'care': 'Полив 1-2 раза в неделю, рассеянный свет',
-        'image_url': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Monstera_deliciosa_leaf.jpg/440px-Monstera_deliciosa_leaf.jpg'
+        'image_url': '1.jpg'
     },
     {
         'id': 3,
