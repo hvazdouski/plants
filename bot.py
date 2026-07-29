@@ -4,12 +4,14 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes, CallbackQueryHandler
 from aiohttp import web
 
+# Настройка логирования
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
+# База данных растений
 PLANTS_DB = [
     {
         'id': 1,
@@ -48,29 +50,21 @@ PLANTS_DB = [
     }
 ]
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = f"Привет, {update.effective_user.first_name}! 🌿\n\nЯ бот-справочник по растениям.\n\n/plants - список растений\n/help - справка"
-    
     keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in PLANTS_DB]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
     await update.message.reply_text(welcome_text, reply_markup=reply_markup)
-
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = "📚 **Команды:**\n/start - начать\n/plants - список растений\n/help - справка"
     await update.message.reply_text(help_text)
 
-
 async def plants_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = "🌱 **Список растений:**\n\n" + "\n".join(f"{p['id']}. {p['name']}" for p in PLANTS_DB)
-    
     keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in PLANTS_DB]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
     await update.message.reply_text(text, reply_markup=reply_markup)
-
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -91,18 +85,16 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await query.message.reply_text(response_text)
 
-
 async def webhook_handler(request):
     """Обработчик входящих обновлений от Telegram"""
     try:
         data = await request.json()
         update = Update.de_json(data, application.bot)
         await application.process_update(update)
-        return web.Response(text="OK") # Явно возвращаем OK
+        return web.Response(text="OK")
     except Exception as e:
         logger.error(f"Ошибка в webhook_handler: {e}")
         return web.Response(text="Error", status=500)
-
 
 def main():
     token = os.environ.get('TELEGRAM_BOT_TOKEN')
@@ -136,7 +128,6 @@ def main():
     
     logger.info(f"Бот запущен на порту {port}")
     web.run_app(app, host='0.0.0.0', port=port)
-
 
 if __name__ == '__main__':
     main()
