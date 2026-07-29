@@ -119,7 +119,7 @@ def main():
     application.add_handler(CallbackQueryHandler(button_callback))
     
     # Настраиваем webhook при запуске
-    webhook_url = os.environ.get('https://plants-7wka.onrender.com/webhook')
+    webhook_url = os.environ.get('WEBHOOK_URL')
     if webhook_url:
         async def post_init(app):
             await app.bot.set_webhook(webhook_url)
