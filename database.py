@@ -40,10 +40,7 @@ PLANTS_DB = [
 
 def get_plant_by_id(plant_id: int):
     """Получить растение по ID"""
-    for plant in PLANTS_DB:
-        if plant['id'] == plant_id:
-            return plant
-    return None
+    return next((p for p in PLANTS_DB if p['id'] == plant_id), None)
 
 def get_all_plants():
     """Получить список всех растений"""
