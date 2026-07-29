@@ -38,13 +38,22 @@ async def plants_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик кнопок с информацией о растении"""
     query = update.callback_query
-    await query.answer()
+    
+    # Безопасный ответ на нажатие кнопки
+    try:
+        await query.answer()
+    except Exception as e:
+        logger.warning(f"Не удалось ответить на callback (возможно, истекло время): {e}")
+        # Если не удалось ответить, продолжаем работу, но игнорируем ошибку ответа
     
     plant_id = int(query.data.split('_')[1])
     plant = get_plant_by_id(plant_id)
     
     if not plant:
-        await query.message.reply_text("Растение не найдено.")
+        try:
+            await query.message.reply_text("Растение не найдено.")
+        except Exception:
+            pass # Игнорируем ошибки отправки, если сообщение уже устарело
         return
         
     name = plant.get('name', 'Без названия')
