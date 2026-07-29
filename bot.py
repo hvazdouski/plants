@@ -89,23 +89,29 @@ async def webhook_handler(request):
     """Обработчик входящих обновлений от Telegram"""
     try:
         data = await request.json()
-        update = Update.de_json(data, application.bot)
-        await application.process_update(update)
+        update = Update.de_json(data, request.app['bot'])
+        await request.app['application'].process_update(update)
         return web.Response(text="OK")
     except Exception as e:
         logger.error(f"Ошибка в webhook_handler: {e}")
         return web.Response(text="Error", status=500)
 
+async def post_init(app):
+    """Настройка webhook после инициализации приложения"""
+    webhook_url = app['webhook_url']
+    await app['bot'].set_webhook(webhook_url)
+    logger.info(f"Webhook установлен на: {webhook_url}")
+
 def main():
     token = os.environ.get('TELEGRAM_BOT_TOKEN')
     port = int(os.environ.get('PORT', 8080))
+    webhook_url = os.environ.get('WEBHOOK_URL')
     
     if not token:
         logger.error("TELEGRAM_BOT_TOKEN не найден!")
         return
     
     # Создаем приложение
-    global application
     application = Application.builder().token(token).build()
     
     # Добавляем обработчики
@@ -114,24 +120,36 @@ def main():
     application.add_handler(CommandHandler("plants", plants_list))
     application.add_handler(CallbackQueryHandler(button_callback))
     
-    # Настраиваем webhook при запуске
-    webhook_url = os.environ.get('WEBHOOK_URL')
-    if webhook_url:
-        async def post_init(app):
-            await app.bot.set_webhook(webhook_url)
-            logger.info(f"Webhook установлен на: {webhook_url}")
-        application.post_init = post_init
-
-    # ВАЖНО: Инициализируем приложение перед запуском сервера
-    import asyncio
-    asyncio.run(application.initialize())
+    # Запускаем веб-сервер aiohttp вместе с приложением telegram
+    async def run_bot():
+        # Инициализируем бота
+        await application.initialize()
+        
+        # Создаем веб-приложение
+        app = web.Application()
+        app['application'] = application
+        app['bot'] = application.bot
+        app['webhook_url'] = webhook_url
+        
+        app.router.add_post('/webhook', webhook_handler)
+        
+        # Устанавливаем webhook если URL предоставлен
+        if webhook_url:
+            await post_init(app)
+        
+        logger.info(f"Бот запущен на порту {port}")
+        
+        # Запускаем веб-сервер
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, '0.0.0.0', port)
+        await site.start()
+        
+        # Держим приложение запущенным
+        while True:
+            await asyncio.sleep(3600)
     
-    # Запускаем веб-сервер aiohttp
-    app = web.Application()
-    app.router.add_post('/webhook', webhook_handler)
-    
-    logger.info(f"Бот запущен на порту {port}")
-    web.run_app(app, host='0.0.0.0', port=port)
+    asyncio.run(run_bot())
 
 if __name__ == '__main__':
     main()
