@@ -121,6 +121,10 @@ def main():
             await app.bot.set_webhook(webhook_url)
             logger.info(f"Webhook установлен на: {webhook_url}")
         application.post_init = post_init
+
+    # ВАЖНО: Инициализируем приложение перед запуском сервера
+    import asyncio
+    asyncio.run(application.initialize())
     
     # Запускаем веб-сервер aiohttp
     app = web.Application()
