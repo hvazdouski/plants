@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 from aiogram.types import InputFile # Или просто используйте ссылку
 
 # Ссылка на ваше изображение на GitHub (Raw URL)
-IMAGE_URL = "https://raw.githubusercontent.com/hvazdouski/plants/refs/heads/main/start.jfif"
+IMAGE_URL = "https://raw.githubusercontent.com/hvazdouski/plants/refs/heads/main/start.jpg"
 
 try:
     await message.answer_photo(
