@@ -1,8 +1,11 @@
 import os
 import logging
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes, CallbackQueryHandler
 from aiohttp import web
+
+from database import get_all_plants, get_plant_by_id
 
 # Настройка логирования
 logging.basicConfig(
@@ -11,48 +14,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# База данных растений
-PLANTS_DB = [
-    {
-        'id': 1,
-        'name': 'Алоэ Вера',
-        'description': 'Суккулент с лекарственными свойствами.',
-        'care': 'Полив раз в 2-3 недели, яркий свет',
-        'image_url': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Aloe_vera_%28L%29_Burman.jpg/440px-Aloe_vera_%28L%29_Burman.jpg'
-    },
-    {
-        'id': 2,
-        'name': 'Монстера',
-        'description': 'Тропическое растение с большими листьями.',
-        'care': 'Полив 1-2 раза в неделю, рассеянный свет',
-        'image_url': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Monstera_deliciosa_leaf.jpg/440px-Monstera_deliciosa_leaf.jpg'
-    },
-    {
-        'id': 3,
-        'name': 'Фикус Бенджамина',
-        'description': 'Популярное комнатное дерево.',
-        'care': 'Полив 2-3 раза в неделю, яркий непрямой свет',
-        'image_url': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Ficus_benjamina_02.jpg/440px-Ficus_benjamina_02.jpg'
-    },
-    {
-        'id': 4,
-        'name': 'Сансевиерия',
-        'description': 'Неприхотливое растение "тещин язык".',
-        'care': 'Полив раз в 2 недели, теневынослива',
-        'image_url': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Sansevieria_trifasciata_var._laurentii.jpg/440px-Sansevieria_trifasciata_var._laurentii.jpg'
-    },
-    {
-        'id': 5,
-        'name': 'Спатифиллум',
-        'description': '"Женское счастье" с белыми цветами.',
-        'care': 'Полив 2-3 раза в неделю, умеренный свет',
-        'image_url': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Spathiphyllum_wallisii_flower.jpg/440px-Spathiphyllum_wallisii_flower.jpg'
-    }
-]
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = f"Привет, {update.effective_user.first_name}! 🌿\n\nЯ бот-справочник по растениям.\n\n/plants - список растений\n/help - справка"
-    keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in PLANTS_DB]
+    plants = get_all_plants()
+    keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in plants]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(welcome_text, reply_markup=reply_markup)
 
@@ -61,8 +26,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(help_text)
 
 async def plants_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = "🌱 **Список растений:**\n\n" + "\n".join(f"{p['id']}. {p['name']}" for p in PLANTS_DB)
-    keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in PLANTS_DB]
+    plants = get_all_plants()
+    text = "🌱 **Список растений:**\n\n" + "\n".join(f"{p['id']}. {p['name']}" for p in plants)
+    keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in plants]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(text, reply_markup=reply_markup)
 
@@ -71,7 +37,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     plant_id = int(query.data.split('_')[1])
-    plant = next((p for p in PLANTS_DB if p['id'] == plant_id), None)
+    plant = get_plant_by_id(plant_id)
     
     if plant:
         response_text = f"🌿 **{plant['name']}**\n\n📝 {plant['description']}\n\n💧 {plant['care']}"
