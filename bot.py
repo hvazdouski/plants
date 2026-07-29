@@ -101,11 +101,11 @@ async def webhook_handler(request):
 
 
 def main():
-    token = os.environ.get('8813775669:AAG_3WOMNHS8HIgDZBKIDpTqJDgIcjHAPGc')
+    token = os.environ.get('TELEGRAM_BOT_TOKEN')
     port = int(os.environ.get('PORT', 8080))
     
     if not token:
-        logger.error("8813775669:AAG_3WOMNHS8HIgDZBKIDpTqJDgIcjHAPGc не найден!")
+        logger.error("TELEGRAM_BOT_TOKEN не найден!")
         return
     
     # Создаем приложение
