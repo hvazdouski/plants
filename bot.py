@@ -64,17 +64,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if plant.get('image_url'):
         try:
-            # Скачиваем изображение через aiohttp и отправляем как файл
-            async with aiohttp.ClientSession() as session:
-                async with session.get(plant['image_url']) as resp:
-                    if resp.status == 200:
-                        image_data = await resp.read()
-                        await query.message.reply_photo(photo=image_data, caption=response_text)
-                    else:
-                        logger.warning(f"Не удалось загрузить фото, статус: {resp.status}")
-                        await query.message.reply_text(response_text)
+            # Отправляем фото по прямой ссылке (Telegram сам скачает его)
+            # Это обходит проблему 403 Forbidden при скачивании с нашей стороны
+            await query.message.reply_photo(
+                photo=plant['image_url'], 
+                caption=response_text
+            )
         except Exception as e:
-            logger.error(f"Ошибка фото: {e}")
+            logger.warning(f"Не удалось отправить фото по ссылке: {e}")
             await query.message.reply_text(response_text)
     else:
         await query.message.reply_text(response_text)
