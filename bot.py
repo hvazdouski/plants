@@ -101,11 +101,11 @@ async def webhook_handler(request):
 
 
 def main():
-    token = os.environ.get('8993479300:AAEOY1hiJp55zMYZEJTZJRCsOMxdMC-c5UI')
+    token = os.environ.get('plant_home_bot')
     port = int(os.environ.get('PORT', 8080))
     
     if not token:
-        logger.error("8993479300:AAEOY1hiJp55zMYZEJTZJRCsOMxdMC-c5UI не найден!")
+        logger.error("plant_home_bot не найден!")
         return
     
     # Создаем приложение
