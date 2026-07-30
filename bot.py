@@ -169,7 +169,7 @@ async def back_to_categories(update: Update, context: ContextTypes.DEFAULT_TYPE)
     text = "📂 **Выберите категорию:**\n\n" + "\n".join(f"• {cat.capitalize()}" for cat in categories)
     
     # Ссылка на изображение для категорий (используем start.jpg как обложку)
-    categories_image_url = "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+    categories_image_url = "https://raw.githubusercontent.com/hvazdouski/plants/main/images/back_to_categories.jpg"
     
     # Пробуем отредактировать сообщение, если не получится - отправляем новое
     try:
