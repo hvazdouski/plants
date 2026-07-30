@@ -28,4 +28,16 @@ node_modules/
 dist/
 build/
 target/
+*.egg-info/
+
+# Testing
+.coverage
+htmlcov/
+.coverage.*
+.nox/
+.tox/
+
+# OS
+.DS_Store
+Thumbs.db
 ```
