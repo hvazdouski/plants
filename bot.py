@@ -163,9 +163,25 @@ async def back_to_categories(update: Update, context: ContextTypes.DEFAULT_TYPE)
     for category in categories:
         keyboard.append([InlineKeyboardButton(f"🌿 {category.capitalize()}", callback_data=f"category_{category}")])
     
+    # Добавляем кнопку "Назад в главное меню"
+    keyboard.append([InlineKeyboardButton("⬅️ Назад в главное меню", callback_data="back_to_main")])
+    
     text = "📂 **Выберите категорию:**\n\n" + "\n".join(f"• {cat.capitalize()}" for cat in categories)
     
-    await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+    # Пробуем отредактировать сообщение, если не получится - удаляем и отправляем новое
+    try:
+        await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+    except Exception as e:
+        logger.warning(f"Не удалось отредактировать сообщение: {e}")
+        # Если редактирование не удалось (например, сообщение с фото), удаляем и отправляем новое
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        await query.message.chat.send_text(
+            text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
 async def show_info_section(update: Update, context: ContextTypes.DEFAULT_TYPE, section_key: str):
     """Показать информационный раздел с текстом и картинкой"""
