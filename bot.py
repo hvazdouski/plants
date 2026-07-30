@@ -234,7 +234,7 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.warning(f"Не удалось ответить на callback: {e}")
     
-    # Создаем клавиатуру с информационными разделами
+    # Создаем клавиатуру с информационными разделами (как в start)
     keyboard = [
         [InlineKeyboardButton("📚 Важная информация о пищеварительной системе", callback_data="info_digestive_system")],
         [InlineKeyboardButton("🌾 Сено — основа рациона!", callback_data="info_hay")],
@@ -243,14 +243,32 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🌿 База растений, овощей, фруктов и ягод", callback_data="back_to_categories")]
     ]
     
-    caption_text = "🐹 **Главное меню**\n\nВыберите раздел:"
-    
-    # Просто отправляем новое сообщение вместо редактирования
-    # Это предотвращает удаление предыдущего сообщения
-    await query.message.reply_text(
-        caption_text,
-        reply_markup=InlineKeyboardMarkup(keyboard)
+    # Ссылка на изображение для приветствия (как в start)
+    start_image_url = "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+
+    caption_text = (
+        f"Привет, {update.effective_user.first_name}! 🐹\n\n"
+        f"Я бот-помощник по уходу и питанию морских свинок.\n\n"
+        f"Я расскажу об особенностях ЖКТ и важности правильного питания морских свинок, "
+        f"а также помогу понять, можно ли твоему питомцу то или иное растение, овощ, фрукт или ягоду, и в каком количестве.\n\n"
+        f"🔍 Как пользоваться: выбери интересующий раздел ниже и хорошенько его изучи.\n\n"
+        f"В скором времени ты сможешь написать название продукта в чат (например: огурец, петрушка, перец), "
+        f"а я выдам информацию о его пользе или вреде, а также о норме потребления!"
     )
+    
+    # Отправляем фото с текстом, как в start
+    try:
+        await query.message.reply_photo(
+            photo=start_image_url,
+            caption=caption_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as e:
+        logger.warning(f"Не удалось отправить фото в back_to_main: {e}")
+        await query.message.reply_text(
+            caption_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик кнопок с информацией о растении и категориями"""
