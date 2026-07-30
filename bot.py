@@ -27,7 +27,7 @@ INFO_SECTIONS = {
                 "• Кишечник длинный, пища проходит быстро\n"
                 "• Не могут синтезировать витамин С самостоятельно\n\n"
                 "⚠️ **Важно:** Пищеварение работает только при постоянном поступлении пищи!",
-        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/digestive_system.jpg"
     },
     "hay": {
         "title": "Сено - основа рациона",
@@ -40,7 +40,7 @@ INFO_SECTIONS = {
                 "• Даёт чувство сытости\n\n"
                 "🥇 **Лучшее сено:** тимофеевка, овсяное, луговое\n"
                 "❌ **Избегать:** пыльное, плесневелое, слишком зелёное",
-        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/hay.jpg"
     },
     "vitamin_c": {
         "title": "Почему витамин С особенно важен?",
@@ -54,7 +54,7 @@ INFO_SECTIONS = {
                 "• В тяжёлых случаях — цинга\n\n"
                 "💊 **Суточная норма:** 10-30 мг\n\n"
                 "🥬 **Источники:** болгарский перец, свежая зелень, специальные добавки",
-        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/vitamin_c.jpg"
     },
     "feeding_rules": {
         "title": "Главные правила кормления",
@@ -66,7 +66,7 @@ INFO_SECTIONS = {
                 "5️⃣ **Витамин С** — ежедневно\n\n"
                 "❌ **Нельзя:** мясо, молочные продукты, сладости, хлеб\n"
                 "⚠️ **Осторожно:** капуста, бобовые (вызывают газы)",
-        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/feeding_rules.jpg"
     }
 }
 
@@ -75,11 +75,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Создаем клавиатуру с информационными разделами
     keyboard = [
-        [InlineKeyboardButton("📚 Общая информация о пищеварительной системе", callback_data="info_digestive_system")],
-        [InlineKeyboardButton("🌾 Сено - основа рациона", callback_data="info_hay")],
+        [InlineKeyboardButton("📚 Важная информация о пищеварительной системе", callback_data="info_digestive_system")],
+        [InlineKeyboardButton("🌾 Сено — основа рациона!", callback_data="info_hay")],
         [InlineKeyboardButton("🍊 Почему витамин С особенно важен?", callback_data="info_vitamin_c")],
-        [InlineKeyboardButton("📋 Главные правила кормления морской свинки", callback_data="info_feeding_rules")],
-        [InlineKeyboardButton("🌿 База растений", callback_data="back_to_categories")]
+        [InlineKeyboardButton("📋 Основные правила кормления", callback_data="info_feeding_rules")],
+        [InlineKeyboardButton("🌿 База растений, овощей, фруктов и ягод", callback_data="back_to_categories")]
     ]
     
     # Ссылка на изображение для приветствия
