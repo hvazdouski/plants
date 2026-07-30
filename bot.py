@@ -79,7 +79,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🌾 Сено — основа рациона!", callback_data="info_hay")],
         [InlineKeyboardButton("🍊 Почему витамин С особенно важен?", callback_data="info_vitamin_c")],
         [InlineKeyboardButton("📋 Основные правила кормления", callback_data="info_feeding_rules")],
-        [InlineKeyboardButton("🌿 База растений, овощей, фруктов и ягод", callback_data="back_to_categories")]
+        [InlineKeyboardButton("🌿 База растений, овощей, фруктов и ягод", callback_data="plants_list")]
     ]
     
     # Ссылка на изображение для приветствия
@@ -213,7 +213,7 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🌾 Сено - основа рациона", callback_data="info_hay")],
         [InlineKeyboardButton("🍊 Почему витамин С особенно важен?", callback_data="info_vitamin_c")],
         [InlineKeyboardButton("📋 Главные правила кормления морской свинки", callback_data="info_feeding_rules")],
-        [InlineKeyboardButton("🌿 База растений", callback_data="back_to_categories")]
+        [InlineKeyboardButton("🌿 База растений", callback_data="plants_list")]
     ]
     
     caption_text = "🐹 **Главное меню**\n\nВыберите раздел:"
