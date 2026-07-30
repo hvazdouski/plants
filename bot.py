@@ -268,7 +268,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     # Обработка кнопки "База растений" из главного меню
-    if query.data == "plants_menu":
+    if query.data == "plants_menu" or query.data == "plants_list":
         await plants_list_from_callback(update, context)
         return
     
