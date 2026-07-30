@@ -8,7 +8,6 @@ __pycache__/
 # Logs and temp files
 *.log
 *.tmp
-*.swp
 
 # Environment
 .env
@@ -28,16 +27,13 @@ node_modules/
 dist/
 build/
 target/
-*.egg-info/
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
 
 # Testing
-.coverage
-htmlcov/
-.coverage.*
-.nox/
-.tox/
-
-# OS
-.DS_Store
-Thumbs.db
+.pytest_cache/
+.mypy_cache/
 ```

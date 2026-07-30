@@ -79,7 +79,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🌾 Сено - основа рациона", callback_data="info_hay")],
         [InlineKeyboardButton("🍊 Почему витамин С особенно важен?", callback_data="info_vitamin_c")],
         [InlineKeyboardButton("📋 Главные правила кормления морской свинки", callback_data="info_feeding_rules")],
-        [InlineKeyboardButton("🌿 База растений", callback_data="back_to_categories")]
+        [InlineKeyboardButton("🌿 База растений", callback_data="plants_menu")]
     ]
     
     # Ссылка на изображение для приветствия
@@ -122,6 +122,26 @@ async def plants_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "\n".join(f"• {cat.capitalize()}" for cat in categories),
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
+
+async def plants_list_from_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик кнопки 'База растений' из главного меню (callback)"""
+    query = update.callback_query
+    
+    try:
+        await query.answer()
+    except Exception as e:
+        logger.warning(f"Не удалось ответить на callback: {e}")
+    
+    categories = get_categories()
+    
+    # Создаем клавиатуру с категориями
+    keyboard = []
+    for category in categories:
+        keyboard.append([InlineKeyboardButton(f"🌿 {category.capitalize()}", callback_data=f"category_{category}")])
+    
+    text = "📂 **Выберите категорию:**\n\n" + "\n".join(f"• {cat.capitalize()}" for cat in categories)
+    
+    await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def show_category_plants(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показать растения выбранной категории"""
@@ -213,7 +233,7 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🌾 Сено - основа рациона", callback_data="info_hay")],
         [InlineKeyboardButton("🍊 Почему витамин С особенно важен?", callback_data="info_vitamin_c")],
         [InlineKeyboardButton("📋 Главные правила кормления морской свинки", callback_data="info_feeding_rules")],
-        [InlineKeyboardButton("🌿 База растений", callback_data="back_to_categories")]
+        [InlineKeyboardButton("🌿 База растений", callback_data="plants_menu")]
     ]
     
     caption_text = "🐹 **Главное меню**\n\nВыберите раздел:"
@@ -245,6 +265,11 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Обработка кнопки "Назад к категориям" (База растений)
     if query.data == "back_to_categories":
         await back_to_categories(update, context)
+        return
+    
+    # Обработка кнопки "База растений" из главного меню
+    if query.data == "plants_menu":
+        await plants_list_from_callback(update, context)
         return
     
     # Обработка информационных разделов
