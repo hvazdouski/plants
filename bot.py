@@ -6,7 +6,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes, CallbackQueryHandler
 from aiohttp import web
 
-from database import get_all_plants, get_plant_by_id
+from database import get_all_plants, get_plant_by_id, get_plants_by_category, get_categories
 
 # Настройка логирования
 logging.basicConfig(
@@ -48,15 +48,76 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("📚 **Команды:**\n/start - начать\n/plants - список растений\n/help - справка")
 
 async def plants_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Команда /plants - список всех растений"""
-    plants = get_all_plants()
-    text = "🌱 **Список растений:**\n\n" + "\n".join(f"{p['id']}. {p['name']}" for p in plants)
+    """Команда /plants - список всех растений по категориям"""
+    categories = get_categories()
+    
+    # Создаем клавиатуру с категориями
+    keyboard = []
+    for category in categories:
+        keyboard.append([InlineKeyboardButton(f"🌿 {category.capitalize()}", callback_data=f"category_{category}")])
+    
+    await update.message.reply_text(
+        "📂 **Выберите категорию:**\n\n" + 
+        "\n".join(f"• {cat.capitalize()}" for cat in categories),
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def show_category_plants(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показать растения выбранной категории"""
+    query = update.callback_query
+    
+    try:
+        await query.answer()
+    except Exception as e:
+        logger.warning(f"Не удалось ответить на callback: {e}")
+    
+    category = query.data.split('_')[1]
+    plants = get_plants_by_category(category)
+    
+    if not plants:
+        await query.message.reply_text(f"В категории '{category}' нет растений.")
+        return
+    
+    text = f"🌱 **Растения категории '{category.capitalize()}':**\n\n"
+    text += "\n".join(f"{p['id']}. {p['name']}" for p in plants)
+    
     keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in plants]
-    await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+    # Кнопка "Назад к категориям"
+    keyboard.append([InlineKeyboardButton("⬅️ Назад к категориям", callback_data="back_to_categories")])
+    
+    await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def back_to_categories(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Вернуться к списку категорий"""
+    query = update.callback_query
+    
+    try:
+        await query.answer()
+    except Exception as e:
+        logger.warning(f"Не удалось ответить на callback: {e}")
+    
+    categories = get_categories()
+    keyboard = []
+    for category in categories:
+        keyboard.append([InlineKeyboardButton(f"🌿 {category.capitalize()}", callback_data=f"category_{category}")])
+    
+    text = "📂 **Выберите категорию:**\n\n" + "\n".join(f"• {cat.capitalize()}" for cat in categories)
+    
+    await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Обработчик кнопок с информацией о растении"""
+    """Обработчик кнопок с информацией о растении и категориями"""
     query = update.callback_query
+    
+    # Обработка кнопки "Назад к категориям"
+    if query.data == "back_to_categories":
+        await back_to_categories(update, context)
+        return
+    
+    # Обработка выбора категории
+    if query.data.startswith("category_"):
+        await show_category_plants(update, context)
+        return
     
     # Безопасный ответ на нажатие кнопки
     try:
