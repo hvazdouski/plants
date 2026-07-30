@@ -132,7 +132,8 @@ async def show_category_plants(update: Update, context: ContextTypes.DEFAULT_TYP
     except Exception as e:
         logger.warning(f"Не удалось ответить на callback: {e}")
     
-    category = query.data.split('_')[1]
+    # Извлекаем категорию из callback_data (формат: category_название)
+    category = query.data.split('_', 1)[1]
     plants = get_plants_by_category(category)
     
     if not plants:
