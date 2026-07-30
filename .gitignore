@@ -1,11 +1,13 @@
-```gitignore
-# Compiled Python files
-*.pyc
+```
+# Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Virtual environments
-venv/
+# Environment
 .venv/
+venv/
 .env
 .env.local
 *.env.*
@@ -13,25 +15,17 @@ venv/
 # Logs
 *.log
 
-# Editor/IDE files
+# Editor
 .vscode/
 .idea/
 *.swp
 *.swo
 *.tmp
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Dependencies and build artifacts
-node_modules/
-dist/
+# Build artifacts
 build/
-target/
-.mypy_cache/
-.pytest_cache/
-.coverage
-coverage/
-htmlcov/
+dist/
+*.o
+*.obj
+*.out
 ```
