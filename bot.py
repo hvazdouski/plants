@@ -15,24 +15,80 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Информационные разделы для главного меню
+INFO_SECTIONS = {
+    "digestive_system": {
+        "title": "Общая информация о пищеварительной системе",
+        "text": "🐹 **Пищеварительная система морской свинки**\n\n"
+                "Морские свинки — травоядные животные с особой пищеварительной системой.\n\n"
+                "📌 **Ключевые особенности:**\n"
+                "• Желудок однокамерный, небольшой объём\n"
+                "• Слепая кишка очень большая — в ней происходит ферментация клетчатки\n"
+                "• Кишечник длинный, пища проходит быстро\n"
+                "• Не могут синтезировать витамин С самостоятельно\n\n"
+                "⚠️ **Важно:** Пищеварение работает только при постоянном поступлении пищи!",
+        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+    },
+    "hay": {
+        "title": "Сено - основа рациона",
+        "text": "🌾 **Сено — основа рациона морской свинки**\n\n"
+                "Сено должно составлять **80-90%** рациона и быть доступно **постоянно**!\n\n"
+                "✅ **Почему сено так важно:**\n"
+                "• Стачивает постоянно растущие зубы\n"
+                "• Содержит необходимую клетчатку для пищеварения\n"
+                "• Предотвращает ожирение\n"
+                "• Даёт чувство сытости\n\n"
+                "🥇 **Лучшее сено:** тимофеевка, овсяное, луговое\n"
+                "❌ **Избегать:** пыльное, плесневелое, слишком зелёное",
+        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+    },
+    "vitamin_c": {
+        "title": "Почему витамин С особенно важен?",
+        "text": "🍊 **Витамин С — жизненно необходим!**\n\n"
+                "Морские свинки **не могут синтезировать витамин С** и должны получать его ежедневно!\n\n"
+                "⚠️ **Признаки дефицита:**\n"
+                "• Слабость, вялость\n"
+                "• Опухшие суставы\n"
+                "• Выпадение шерсти\n"
+                "• Кровоточащие дёсны\n"
+                "• В тяжёлых случаях — цинга\n\n"
+                "💊 **Суточная норма:** 10-30 мг\n\n"
+                "🥬 **Источники:** болгарский перец, свежая зелень, специальные добавки",
+        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+    },
+    "feeding_rules": {
+        "title": "Главные правила кормления",
+        "text": "📋 **Главные правила кормления морской свинки**\n\n"
+                "1️⃣ **Сено** — всегда в неограниченном количестве\n"
+                "2️⃣ **Свежие овощи** — 1 стакан в день (разнообразные)\n"
+                "3️⃣ **Вода** — чистая, свежая, всегда доступна\n"
+                "4️⃣ **Гранулы** — 1-2 ст. ложки в день (не больше!)\n"
+                "5️⃣ **Витамин С** — ежедневно\n\n"
+                "❌ **Нельзя:** мясо, молочные продукты, сладости, хлеб\n"
+                "⚠️ **Осторожно:** капуста, бобовые (вызывают газы)",
+        "image_url": "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+    }
+}
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Команда /start - приветствие и меню категорий"""
-    categories = get_categories()
+    """Команда /start - приветствие и главное меню"""
     
-    # Создаем клавиатуру с категориями
-    keyboard = []
-    for category in categories:
-        keyboard.append([InlineKeyboardButton(f"🌿 {category.capitalize()}", callback_data=f"category_{category}")])
+    # Создаем клавиатуру с информационными разделами
+    keyboard = [
+        [InlineKeyboardButton("📚 Общая информация о пищеварительной системе", callback_data="info_digestive_system")],
+        [InlineKeyboardButton("🌾 Сено - основа рациона", callback_data="info_hay")],
+        [InlineKeyboardButton("🍊 Почему витамин С особенно важен?", callback_data="info_vitamin_c")],
+        [InlineKeyboardButton("📋 Главные правила кормления морской свинки", callback_data="info_feeding_rules")],
+        [InlineKeyboardButton("🌿 База растений", callback_data="back_to_categories")]
+    ]
     
-    # Ссылка на изображение для приветствия (можно заменить на свою)
+    # Ссылка на изображение для приветствия
     start_image_url = "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
     
     caption_text = (
-        f"Привет, {update.effective_user.first_name}! 🌿\n\n"
-        f"Я бот-справочник по растениям.\n\n"
-        f"Выберите категорию ниже или используйте команды:\n"
-        f"/plants - список категорий\n"
-        f"/help - справка"
+        f"Привет, {update.effective_user.first_name}! 🐹\n\n"
+        f"Я бот-справочник по уходу за морскими свинками.\n\n"
+        f"Выберите раздел ниже:"
     )
     
     try:
@@ -110,13 +166,77 @@ async def back_to_categories(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
 
+async def show_info_section(update: Update, context: ContextTypes.DEFAULT_TYPE, section_key: str):
+    """Показать информационный раздел с текстом и картинкой"""
+    query = update.callback_query
+    
+    try:
+        await query.answer()
+    except Exception as e:
+        logger.warning(f"Не удалось ответить на callback: {e}")
+    
+    if section_key not in INFO_SECTIONS:
+        await query.message.reply_text("Раздел не найден.")
+        return
+    
+    section = INFO_SECTIONS[section_key]
+    text = section["text"]
+    image_url = section["image_url"]
+    
+    # Кнопка "Назад в главное меню"
+    keyboard = [[InlineKeyboardButton("⬅️ Назад в главное меню", callback_data="back_to_main")]]
+    
+    try:
+        await query.message.reply_photo(
+            photo=image_url,
+            caption=text,
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode='Markdown'
+        )
+    except Exception as e:
+        logger.warning(f"Не удалось отправить фото: {e}")
+        await query.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Вернуться в главное меню"""
+    query = update.callback_query
+    
+    try:
+        await query.answer()
+    except Exception as e:
+        logger.warning(f"Не удалось ответить на callback: {e}")
+    
+    # Создаем клавиатуру с информационными разделами
+    keyboard = [
+        [InlineKeyboardButton("📚 Общая информация о пищеварительной системе", callback_data="info_digestive_system")],
+        [InlineKeyboardButton("🌾 Сено - основа рациона", callback_data="info_hay")],
+        [InlineKeyboardButton("🍊 Почему витамин С особенно важен?", callback_data="info_vitamin_c")],
+        [InlineKeyboardButton("📋 Главные правила кормления морской свинки", callback_data="info_feeding_rules")],
+        [InlineKeyboardButton("🌿 База растений", callback_data="back_to_categories")]
+    ]
+    
+    caption_text = "🐹 **Главное меню**\n\nВыберите раздел:"
+    
+    await query.message.edit_text(caption_text, reply_markup=InlineKeyboardMarkup(keyboard))
+
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик кнопок с информацией о растении и категориями"""
     query = update.callback_query
     
-    # Обработка кнопки "Назад к категориям"
+    # Обработка кнопки "Назад в главное меню"
+    if query.data == "back_to_main":
+        await back_to_main(update, context)
+        return
+    
+    # Обработка кнопки "Назад к категориям" (База растений)
     if query.data == "back_to_categories":
         await back_to_categories(update, context)
+        return
+    
+    # Обработка информационных разделов
+    if query.data.startswith("info_"):
+        section_key = query.data.replace("info_", "")
+        await show_info_section(update, context, section_key)
         return
     
     # Обработка выбора категории
