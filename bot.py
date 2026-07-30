@@ -230,20 +230,12 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     caption_text = "🐹 **Главное меню**\n\nВыберите раздел:"
     
-    # Пробуем отредактировать сообщение, если не получится - удаляем и отправляем новое
-    try:
-        await query.message.edit_text(caption_text, reply_markup=InlineKeyboardMarkup(keyboard))
-    except Exception as e:
-        logger.warning(f"Не удалось отредактировать сообщение: {e}")
-        # Если редактирование не удалось (например, сообщение с фото), удаляем и отправляем новое
-        try:
-            await query.message.delete()
-        except Exception:
-            pass
-        await query.message.chat.send_text(
-            caption_text,
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+    # Просто отправляем новое сообщение вместо редактирования
+    # Это предотвращает удаление предыдущего сообщения
+    await query.message.reply_text(
+        caption_text,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик кнопок с информацией о растении и категориями"""
