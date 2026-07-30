@@ -16,20 +16,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-from aiogram.types import InputFile # Или просто используйте ссылку
-
-# Ссылка на ваше изображение на GitHub (Raw URL)
-IMAGE_URL = "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
-             
-try:
-    await message.answer_photo(
-        photo=IMAGE_URL,
-        caption="Привет! Я бот о растениях.\nНажми /help, чтобы узнать больше."
-    )
-except Exception as e:
-    # Если картинка не загрузится, бот отправит хотя бы текст
-    await message.answer("Привет! Я бот о растениях.\nНажми /help, чтобы узнать больше.")
-    print(f"Ошибка отправки фото: {e}")    
     """Команда /start - приветствие и меню"""
     plants = get_all_plants()
     keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in plants]
