@@ -88,7 +88,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     caption_text = (
         f"Привет, {update.effective_user.first_name}! 🐹\n\n"
         f"Я бот-справочник по уходу за морскими свинками.\n\n"
-        f"Выберите раздел ниже:"
+        f"Выберите раздел ниже: "
     )
     
     try:
