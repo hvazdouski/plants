@@ -168,17 +168,13 @@ async def back_to_categories(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     text = "📂 **Выберите категорию:**\n\n" + "\n".join(f"• {cat.capitalize()}" for cat in categories)
     
-    # Пробуем отредактировать сообщение, если не получится - удаляем и отправляем новое
+    # Пробуем отредактировать сообщение, если не получится - отправляем новое
     try:
         await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
     except Exception as e:
         logger.warning(f"Не удалось отредактировать сообщение: {e}")
-        # Если редактирование не удалось (например, сообщение с фото), удаляем и отправляем новое
-        try:
-            await query.message.delete()
-        except Exception:
-            pass
-        await query.message.chat.send_text(
+        # Если редактирование не удалось (например, сообщение с фото), просто отправляем новое
+        await query.message.reply_text(
             text,
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
