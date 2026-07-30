@@ -19,8 +19,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 from aiogram.types import InputFile # Или просто используйте ссылку
 
 # Ссылка на ваше изображение на GitHub (Raw URL)
-IMAGE_URL = "https://raw.githubusercontent.com/hvazdouski/plants/refs/heads/main/start.jpg"
-
+IMAGE_URL = "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+             
 try:
     await message.answer_photo(
         photo=IMAGE_URL,
