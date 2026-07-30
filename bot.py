@@ -168,16 +168,27 @@ async def back_to_categories(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     text = "📂 **Выберите категорию:**\n\n" + "\n".join(f"• {cat.capitalize()}" for cat in categories)
     
+    # Ссылка на изображение для категорий (используем start.jpg как обложку)
+    categories_image_url = "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
+    
     # Пробуем отредактировать сообщение, если не получится - отправляем новое
     try:
         await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
     except Exception as e:
         logger.warning(f"Не удалось отредактировать сообщение: {e}")
-        # Если редактирование не удалось (например, сообщение с фото), просто отправляем новое
-        await query.message.reply_text(
-            text,
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+        # Если редактирование не удалось (например, сообщение с фото), отправляем фото с текстом
+        try:
+            await query.message.reply_photo(
+                photo=categories_image_url,
+                caption=text,
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        except Exception as photo_error:
+            logger.warning(f"Не удалось отправить фото: {photo_error}")
+            await query.message.reply_text(
+                text,
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
 
 async def show_info_section(update: Update, context: ContextTypes.DEFAULT_TYPE, section_key: str):
     """Показать информационный раздел с текстом и картинкой"""
