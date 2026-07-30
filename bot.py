@@ -16,9 +16,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Команда /start - приветствие и меню"""
-    plants = get_all_plants()
-    keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in plants]
+    """Команда /start - приветствие и меню категорий"""
+    categories = get_categories()
+    
+    # Создаем клавиатуру с категориями
+    keyboard = []
+    for category in categories:
+        keyboard.append([InlineKeyboardButton(f"🌿 {category.capitalize()}", callback_data=f"category_{category}")])
     
     # Ссылка на изображение для приветствия (можно заменить на свою)
     start_image_url = "https://raw.githubusercontent.com/hvazdouski/plants/main/images/start.jpg"
@@ -26,7 +30,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     caption_text = (
         f"Привет, {update.effective_user.first_name}! 🌿\n\n"
         f"Я бот-справочник по растениям.\n\n"
-        f"/plants - список растений\n"
+        f"Выберите категорию ниже или используйте команды:\n"
+        f"/plants - список категорий\n"
         f"/help - справка"
     )
     
