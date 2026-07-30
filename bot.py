@@ -19,10 +19,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Команда /start - приветствие и меню"""
     plants = get_all_plants()
     keyboard = [[InlineKeyboardButton(p['name'], callback_data=f"plant_{p['id']}")] for p in plants]
-    await update.message.reply_text(
-        f"Привет, {update.effective_user.first_name}! 🌿\n\nЯ бот-справочник по растениям.\n\n/plants - список растений\n/help - справка",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+    
+    # Ссылка на изображение для приветствия (можно заменить на свою)
+    start_image_url = "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    
+    caption_text = (
+        f"Привет, {update.effective_user.first_name}! 🌿\n\n"
+        f"Я бот-справочник по растениям.\n\n"
+        f"/plants - список растений\n"
+        f"/help - справка"
     )
+    
+    try:
+        await update.message.reply_photo(
+            photo=start_image_url,
+            caption=caption_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as e:
+        logger.warning(f"Не удалось отправить фото в start: {e}")
+        await update.message.reply_text(
+            caption_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Команда /help - справка"""

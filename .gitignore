@@ -1,31 +1,3 @@
-```
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+(bot.py is a source file, so no additional ignores are needed beyond what's already in the current .gitignore if anything)
 
-# Environment
-.venv/
-venv/
-.env
-.env.local
-*.env.*
-
-# Logs
-*.log
-
-# Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# Build artifacts
-build/
-dist/
-*.o
-*.obj
-*.out
-```
+# No changes needed - bot.py is a source file and should not be ignored
